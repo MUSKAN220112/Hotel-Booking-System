@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Rooms - SmartStay Hotels{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Our Rooms</h2>
+    
+    <div class="rooms-grid" id="roomsContainer">
+        <!-- Rooms will be loaded here -->
+    </div>
+</div>
+
+<script>
+async function loadRooms() {
+    try {
+        const response = await fetch('/api/rooms');
+        const rooms = await response.json();
+        
+        const container = document.getElementById('roomsContainer');
+        container.innerHTML = '';
+        
+        if (rooms.length === 0) {
+            container.innerHTML = '<p>No rooms available at the moment.</p>';
+            return;
+        }
+        
+        rooms.forEach(room => {
+            const card = document.createElement('div');
+            card.className = 'room-card';
+            card.innerHTML = `
+                <h3>${room.room_number} - ${room.room_type}</h3>
+                <p><strong>Capacity:</strong> ${room.capacity} guests</p>
+                <p><strong>Price:</strong> $${room.price_per_night}/night</p>
+                <p>${room.description}</p>
+                <p><strong>Amenities:</strong> ${room.amenities}</p>
+                <button class="btn btn-primary" onclick="bookRoom(${room.id})">Book Now</button>
+            `;
+            container.appendChild(card);
+        });
+    } catch (error) {
+        console.error('Error loading rooms:', error);
+    }
+}
+
+function bookRoom(roomId) {
+    const userId = '{{ session.get("user_id") }}';
+    if (!userId || userId === 'None') {
+        alert('Please login to book a room');
+        window.location.href = '/login';
+    } else {
+        window.location.href = '/booking?room_id=' + roomId;
+    }
+}
+
+loadRooms();
+</script>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}{{ room.hotel_name }} - {{ room.room_type }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Room Images -->
+        <div class="col-lg-6" data-aos="fade-right">
+            <div class="room-gallery mb-4">
+                <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&h=450&fit=crop" class="img-fluid rounded shadow" alt="{{ room.room_type }}">
+            </div>
+            <div class="row g-2">
+                <div class="col-3">
+                    <img src="https://images.unsplash.com/photo-1611505946902-a2c99338b3ca?w=200&h=150&fit=crop" class="img-fluid rounded" alt="Thumbnail">
+                </div>
+                <div class="col-3">
+                    <img src="https://images.unsplash.com/photo-1611505946902-a2c99338b3ca?w=200&h=150&fit=crop" class="img-fluid rounded" alt="Thumbnail">
+                </div>
+                <div class="col-3">
+                    <img src="https://images.unsplash.com/photo-1611505946902-a2c99338b3ca?w=200&h=150&fit=crop" class="img-fluid rounded" alt="Thumbnail">
+                </div>
+                <div class="col-3">
+                    <img src="https://images.unsplash.com/photo-1611505946902-a2c99338b3ca?w=200&h=150&fit=crop" class="img-fluid rounded" alt="Thumbnail">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Room Details -->
+        <div class="col-lg-6" data-aos="fade-left">
+            <div class="card shadow-sm p-4 mb-4">
+                <h2 class="mb-2">{{ room.room_type }} Room</h2>
+                <p class="text-muted mb-3">
+                    <i class="fas fa-map-marker-alt"></i> {{ room.hotel_name }}, {{ room.city }}
+                </p>
+                
+                <div class="rating mb-3">
+                    <span class="text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </span>
+                    <span class="ms-2">{{ room.rating }} (234 reviews)</span>
+                </div>
+                
+                <hr>
+                
+                <h4 class="text-primary mb-4">${{ room.price_per_night }}<small class="text-muted">/night</small></h4>
+                
+                <!-- Room Features -->
+                <h5 class="mb-3">Room Features</h5>
+                <ul class="list-unstyled mb-4">
+                    <li class="mb-2"><i class="fas fa-check text-success"></i> Capacity: {{ room.capacity }} Guests</li>
+                    <li class="mb-2"><i class="fas fa-check text-success"></i> Amenities: {{ room.amenities }}</li>
+                    <li class="mb-2"><i class="fas fa-check text-success"></i> Description: {{ room.description }}</li>
+                    <li class="mb-2"><i class="fas fa-check text-success"></i> Free WiFi</li>
+                    <li class="mb-2"><i class="fas fa-check text-success"></i> Air Conditioning</li>
+                </ul>
+                
+                {% if session.get('user_id') %}
+                    <a href="/booking/{{ room.id }}" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-calendar-check"></i> Book This Room
+                    </a>
+                {% else %}
+                    <a href="/login" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-sign-in-alt"></i> Login to Book
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reviews Section -->
+    <div class="row mt-5">
+        <div class="col-lg-8 mx-auto">
+            <h3 class="mb-4" data-aos="fade-up"><i class="fas fa-comments"></i> Guest Reviews</h3>
+            
+            {% if reviews %}
+                {% for review in reviews %}
+                <div class="card mb-3 shadow-sm" data-aos="fade-up">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <h6 class="card-title mb-0">{{ review.user_name }}</h6>
+                            <div class="text-warning">
+                                {% for i in range(review.rating) %}
+                                    <i class="fas fa-star"></i>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p class="card-text text-muted">{{ review.comment }}</p>
+                        <small class="text-muted">{{ review.created_at }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No reviews yet. Be the first to review!</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

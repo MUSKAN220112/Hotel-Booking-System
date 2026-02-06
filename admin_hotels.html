@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Hotels - SmartStay Hotels{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <h2 class="mb-4" data-aos="fade-up"><i class="fas fa-hotel"></i> Manage Hotels</h2>
+    
+    <!-- Add Hotel Form -->
+    <div class="card shadow-sm mb-5" data-aos="fade-up">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-plus"></i> Add New Hotel</h5>
+        </div>
+        <div class="card-body">
+            <form id="addHotelForm" class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Hotel Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="Enter hotel name" required>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">City</label>
+                    <input type="text" id="city" class="form-control" placeholder="City name" required>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Rating</label>
+                    <input type="number" id="rating" class="form-control" min="0" max="5" step="0.1" value="4.5">
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Address</label>
+                    <input type="text" id="address" class="form-control" placeholder="Full address" required>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Phone</label>
+                    <input type="tel" id="phone" class="form-control" placeholder="Phone number">
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="Email address">
+                </div>
+                
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Description</label>
+                    <textarea id="description" class="form-control" rows="3" placeholder="Hotel description"></textarea>
+                </div>
+                
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus"></i> Add Hotel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Hotels List -->
+    <div class="card shadow-sm" data-aos="fade-up">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Current Hotels ({{ hotels|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% if hotels %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>City</th>
+                                <th>Address</th>
+                                <th>Rating</th>
+                                <th>Contact</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hotel in hotels %}
+                            <tr>
+                                <td><strong>{{ hotel.name }}</strong></td>
+                                <td>{{ hotel.city }}</td>
+                                <td>{{ hotel.address }}</td>
+                                <td>
+                                    <span class="text-warning">
+                                        <i class="fas fa-star"></i> {{ hotel.rating }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small>{{ hotel.phone }}<br>{{ hotel.email }}</small>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted text-center py-4">No hotels added yet</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('addHotelForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const data = {
+        name: document.getElementById('name').value,
+        city: document.getElementById('city').value,
+        address: document.getElementById('address').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        description: document.getElementById('description').value,
+        rating: parseFloat(document.getElementById('rating').value)
+    };
+    
+    try {
+        const response = await fetch('/admin/hotels/add', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('✅ ' + result.message);
+            document.getElementById('addHotelForm').reset();
+            location.reload();
+        } else {
+            alert('❌ Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('❌ Error: ' + error.message);
+    }
+});
+</script>
+{% endblock %}

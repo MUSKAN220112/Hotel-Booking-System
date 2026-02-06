@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - SmartStay Hotels{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3">
+            <div class="card shadow-sm p-4" data-aos="fade-right">
+                <h5 class="mb-4"><i class="fas fa-filter"></i> Filters</h5>
+                
+                <form id="filterForm" action="/search" method="GET">
+                    {% if check_in %}
+                        <input type="hidden" name="check_in" value="{{ check_in }}">
+                    {% endif %}
+                    {% if check_out %}
+                        <input type="hidden" name="check_out" value="{{ check_out }}">
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Price Range</label>
+                        <input type="range" class="form-range" id="priceRange" min="0" max="1000" value="1000" name="max_price">
+                        <small class="text-muted">Max: $<span id="priceValue">1000</span>/night</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Room Type</label>
+                        <select name="room_type" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="Single" {% if room_type == 'Single' %}selected{% endif %}>Single</option>
+                            <option value="Double" {% if room_type == 'Double' %}selected{% endif %}>Double</option>
+                            <option value="Suite" {% if room_type == 'Suite' %}selected{% endif %}>Suite</option>
+                            <option value="Penthouse" {% if room_type == 'Penthouse' %}selected{% endif %}>Penthouse</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">City</label>
+                        <input type="text" name="city" class="form-control" value="{{ city }}" placeholder="Enter city">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Apply Filters
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Results -->
+        <div class="col-lg-9">
+            <h3 class="mb-4" data-aos="fade-up">
+                <i class="fas fa-building"></i> Available Rooms 
+                <span class="badge bg-info">{{ rooms|length }}</span>
+            </h3>
+            
+            {% if rooms %}
+                <div class="row g-4">
+                    {% for room in rooms %}
+                    <div class="col-md-6 col-xl-6" data-aos="fade-up">
+                        <div class="card h-100 shadow-sm border-0 room-card-search">
+                            <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&h=350&fit=crop" class="card-img-top" alt="{{ room.room_type }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ room.hotel_name }}</h5>
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-map-marker-alt"></i> {{ room.city }}
+                                </p>
+                                <p class="mb-2">
+                                    <i class="fas fa-star text-warning"></i> {{ room.rating }}
+                                </p>
+                                
+                                <div class="room-info mb-3">
+                                    <span class="badge bg-light text-dark me-2">
+                                        <i class="fas fa-door-open"></i> {{ room.room_type }}
+                                    </span>
+                                    <span class="badge bg-light text-dark">
+                                        <i class="fas fa-users"></i> {{ room.capacity }} Guests
+                                    </span>
+                                </div>
+                                
+                                <p class="text-muted small">{{ room.amenities }}</p>
+                                
+                                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                    <h5 class="mb-0 text-primary">${{ room.price_per_night }}/night</h5>
+                                    <a href="/booking/{{ room.id }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-calendar"></i> Book Now
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center py-5" role="alert">
+                    <i class="fas fa-search fa-3x mb-3"></i>
+                    <h5>No rooms found</h5>
+                    <p>Try adjusting your search criteria</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('priceRange').addEventListener('input', function() {
+    document.getElementById('priceValue').textContent = this.value;
+});
+</script>
+{% endblock %}

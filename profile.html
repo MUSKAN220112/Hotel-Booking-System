@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - SmartStay Hotels{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-4" data-aos="fade-right">
+            <div class="card shadow-sm p-4 text-center">
+                <div class="mb-3">
+                    <i class="fas fa-user-circle fa-5x text-primary"></i>
+                </div>
+                <h4>{{ user.name }}</h4>
+                <p class="text-muted">{{ user.email }}</p>
+                <p class="text-muted">{{ user.phone }}</p>
+                <span class="badge bg-primary">{{ user.role|capitalize }}</span>
+                <button class="btn btn-outline-primary w-100 mt-3">Edit Profile</button>
+            </div>
+        </div>
+        
+        <div class="col-lg-8" data-aos="fade-left">
+            <div class="card shadow-sm p-4 mb-4">
+                <h5 class="mb-4"><i class="fas fa-info-circle"></i> Account Information</h5>
+                <table class="table">
+                    <tr>
+                        <td class="fw-semibold">Full Name</td>
+                        <td>{{ user.name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">Email</td>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">Phone</td>
+                        <td>{{ user.phone or 'Not provided' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">Account Type</td>
+                        <td><span class="badge bg-primary">{{ user.role|capitalize }}</span></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">Member Since</td>
+                        <td>{{ user.created_at[:10] }}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="card shadow-sm p-4">
+                <h5 class="mb-4"><i class="fas fa-chart-pie"></i> Booking Statistics</h5>
+                <div class="row text-center">
+                    <div class="col-md-6">
+                        <h3 class="text-primary">{{ bookings_count }}</h3>
+                        <p class="text-muted">Total Bookings</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 class="text-success">0</h3>
+                        <p class="text-muted">Completed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <div class="card shadow-sm p-4">
+                <h5 class="mb-4"><i class="fas fa-cog"></i> Account Settings</h5>
+                <button class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-key"></i> Change Password
+                </button>
+                <button class="btn btn-outline-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

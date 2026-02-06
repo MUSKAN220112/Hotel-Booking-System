@@ -1,0 +1,17 @@
+{
+  "name": "smartstay-hotel-booking",
+  "version": "1.0.0",
+  "description": "Hotel Booking System - Deploy to Render",
+  "main": "hotel.py",
+  "scripts": {
+    "start": "gunicorn hotel:app",
+    "dev": "python hotel.py"
+  },
+  "keywords": [
+    "hotel",
+    "booking",
+    "flask"
+  ],
+  "author": "SmartStay",
+  "license": "MIT"
+}

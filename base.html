@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SmartStay Hotel Booking System{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AOS Animate On Scroll -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-hotel"></i> SmartStay Hotels
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/search">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    {% if session.get('user_id') %}
+                        {% if session.get('user_role') == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/admin">
+                                    <i class="fas fa-tachometer-alt"></i> Admin
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i> {{ session.get('user_name') }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                <li><a class="dropdown-item" href="/profile"><i class="fas fa-user"></i> Profile</a></li>
+                                <li><a class="dropdown-item" href="/my-bookings"><i class="fas fa-calendar"></i> My Bookings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/login">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/register">
+                                <i class="fas fa-user-plus"></i> Register
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{{ 'exclamation-circle' if category == 'error' else 'check-circle' }}"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light mt-5 pt-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5><i class="fas fa-hotel text-info"></i> SmartStay Hotels</h5>
+                    <p class="text-muted">Your trusted platform for booking quality accommodations worldwide.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled text-muted">
+                        <li><a href="/" class="text-muted text-decoration-none">Home</a></li>
+                        <li><a href="/search" class="text-muted text-decoration-none">Search Hotels</a></li>
+                        <li><a href="/my-bookings" class="text-muted text-decoration-none">My Bookings</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Contact</h5>
+                    <p class="text-muted">
+                        <i class="fas fa-envelope"></i> info@smartstay.com<br>
+                        <i class="fas fa-phone"></i> +1 (800) STAY-NOW
+                    </p>
+                </div>
+            </div>
+            <hr class="bg-secondary">
+            <div class="text-center pb-3">
+                <p class="text-muted mb-0">
+                    &copy; 2026 SmartStay Hotels. All rights reserved. | 
+                    <strong style="color: #00d4ff;">Made by Muskan Chohan</strong>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <script>
+        // Initialize AOS
+        AOS.init();
+        
+        // Setup CSRF token for AJAX requests
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (settings.type == 'POST' || settings.type == 'PUT' || settings.type == 'DELETE') {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() if csrf_token else '' }}");
+                }
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

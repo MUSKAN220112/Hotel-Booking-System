@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Bookings - SmartStay Hotels{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <h2 class="mb-4" data-aos="fade-up"><i class="fas fa-calendar-check"></i> Manage Bookings</h2>
+    
+    <div class="card shadow-sm" data-aos="fade-up">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-list"></i> All Bookings ({{ bookings|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% if bookings %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Guest</th>
+                                <th>Hotel</th>
+                                <th>Room</th>
+                                <th>Check-in</th>
+                                <th>Check-out</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings %}
+                            <tr>
+                                <td><small class="fw-bold">{{ booking.booking_id }}</small></td>
+                                <td>{{ booking.user_name }}</td>
+                                <td><strong>{{ booking.hotel_name }}</strong></td>
+                                <td>{{ booking.room_number }}</td>
+                                <td>{{ booking.check_in_date }}</td>
+                                <td>{{ booking.check_out_date }}</td>
+                                <td class="text-primary fw-bold">${{ "%.2f"|format(booking.total_price) }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if booking.status == 'confirmed' else 'warning' if booking.status == 'pending' else 'danger' }}">
+                                        {{ booking.status|capitalize }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted text-center py-4">No bookings found</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

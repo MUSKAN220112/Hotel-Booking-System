@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Book {{ room.room_type }} - SmartStay Hotels{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm p-4">
+                <h3 class="mb-4"><i class="fas fa-calendar-check"></i> Booking Details</h3>
+                
+                <div class="row mb-4 p-3 bg-light rounded">
+                    <div class="col-md-6">
+                        <h6>Room Information</h6>
+                        <p class="mb-1"><strong>{{ room.hotel_name }}</strong></p>
+                        <p class="mb-1">Room {{ room.room_number }} - {{ room.room_type }}</p>
+                        <p class="text-muted">{{ room.city }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Price</h6>
+                        <p class="text-primary fs-5"><strong>${{ room.price_per_night }}/night</strong></p>
+                    </div>
+                </div>
+                
+                <form id="bookingForm" class="booking-form">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Check-in Date</label>
+                            <input type="date" id="check_in_date" name="check_in_date" class="form-control form-control-lg" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Check-out Date</label>
+                            <input type="date" id="check_out_date" name="check_out_date" class="form-control form-control-lg" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Number of Guests</label>
+                        <input type="number" name="number_of_guests" class="form-control form-control-lg" value="1" min="1" max="{{ room.capacity }}" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Special Requests (Optional)</label>
+                        <textarea name="special_requests" class="form-control" rows="4" placeholder="Any special requirements?"></textarea>
+                    </div>
+                    
+                    <div class="alert alert-info" id="priceAlert" style="display: none;">
+                        <strong>Total Price: </strong><span id="totalPrice">$0</span>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-credit-card"></i> Confirm Booking
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm p-4 sticky-top" style="top: 100px;">
+                <h5 class="mb-3">Booking Summary</h5>
+                <div class="mb-3 pb-3 border-bottom">
+                    <small class="text-muted">Room</small>
+                    <p class="mb-0">{{ room.room_type }}</p>
+                </div>
+                <div class="mb-3 pb-3 border-bottom">
+                    <small class="text-muted">Check-in</small>
+                    <p class="mb-0" id="summaryCheckIn">Select date</p>
+                </div>
+                <div class="mb-3 pb-3 border-bottom">
+                    <small class="text-muted">Check-out</small>
+                    <p class="mb-0" id="summaryCheckOut">Select date</p>
+                </div>
+                <div class="mb-3 pb-3 border-bottom">
+                    <small class="text-muted">Nights</small>
+                    <p class="mb-0" id="summaryNights">0</p>
+                </div>
+                <div class="mb-3 pb-3 border-bottom">
+                    <small class="text-muted">Price per Night</small>
+                    <p class="mb-0">${{ room.price_per_night }}</p>
+                </div>
+                <div>
+                    <small class="text-muted">Total</small>
+                    <h5 class="text-primary" id="summaryTotal">$0</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const checkInInput = document.getElementById('check_in_date');
+    const checkOutInput = document.getElementById('check_out_date');
+    
+    checkInInput.setAttribute('min', today);
+    checkOutInput.setAttribute('min', today);
+    
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+    checkInInput.value = today;
+    checkOutInput.value = tomorrow;
+    
+    updatePrice();
+});
+
+document.getElementById('check_in_date').addEventListener('change', function() {
+    const checkOut = document.getElementById('check_out_date');
+    if (new Date(this.value) >= new Date(checkOut.value)) {
+        const next = new Date(this.value);
+        next.setDate(next.getDate() + 1);
+        checkOut.value = next.toISOString().split('T')[0];
+    }
+    updatePrice();
+});
+
+document.getElementById('check_out_date').addEventListener('change', updatePrice);
+
+function updatePrice() {
+    const checkIn = new Date(document.getElementById('check_in_date').value);
+    const checkOut = new Date(document.getElementById('check_out_date').value);
+    const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+    const pricePerNight = {{ room.price_per_night }};
+    const total = nights * pricePerNight;
+    
+    document.getElementById('summaryCheckIn').textContent = checkIn.toDateString();
+    document.getElementById('summaryCheckOut').textContent = checkOut.toDateString();
+    document.getElementById('summaryNights').textContent = nights > 0 ? nights : 0;
+    document.getElementById('summaryTotal').textContent = '$' + (nights > 0 ? total.toFixed(2) : 0);
+    document.getElementById('totalPrice').textContent = '$' + (nights > 0 ? total.toFixed(2) : 0);
+    
+    if (nights > 0) {
+        document.getElementById('priceAlert').style.display = 'block';
+    }
+}
+
+document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const roomId = {{ room.id }};
+    const data = {
+        check_in_date: document.getElementById('check_in_date').value,
+        check_out_date: document.getElementById('check_out_date').value,
+        number_of_guests: parseInt(document.querySelector('input[name="number_of_guests"]').value),
+        special_requests: document.querySelector('textarea[name="special_requests"]').value
+    };
+    
+    try {
+        const response = await fetch('/booking/' + roomId, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('✅ Booking confirmed!\nBooking ID: ' + result.booking_id + '\nTotal: ' + result.total_price);
+            window.location.href = '/my-bookings';
+        } else {
+            alert('❌ Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Rooms - SmartStay Hotels{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <h2 class="mb-4" data-aos="fade-up"><i class="fas fa-door-open"></i> Manage Rooms</h2>
+    
+    <!-- Add Room Form -->
+    <div class="card shadow-sm mb-5" data-aos="fade-up">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-plus"></i> Add New Room</h5>
+        </div>
+        <div class="card-body">
+            <form id="addRoomForm" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Hotel</label>
+                    <select id="hotel_id" class="form-select" required>
+                        <option value="">-- Select Hotel --</option>
+                        {% for hotel in hotels %}
+                        <option value="{{ hotel.id }}">{{ hotel.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Room Number</label>
+                    <input type="text" id="room_number" class="form-control" placeholder="e.g., 101" required>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Room Type</label>
+                    <select id="room_type" class="form-select" required>
+                        <option value="">-- Select Type --</option>
+                        <option value="Single">Single</option>
+                        <option value="Double">Double</option>
+                        <option value="Suite">Suite</option>
+                        <option value="Penthouse">Penthouse</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Capacity</label>
+                    <input type="number" id="capacity" class="form-control" min="1" placeholder="Number of guests" required>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Price per Night ($)</label>
+                    <input type="number" id="price_per_night" class="form-control" step="0.01" placeholder="100.00" required>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Description</label>
+                    <textarea id="description" class="form-control" rows="2" placeholder="Room description"></textarea>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Amenities</label>
+                    <textarea id="amenities" class="form-control" rows="2" placeholder="e.g., WiFi, AC, TV, Mini-bar"></textarea>
+                </div>
+                
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus"></i> Add Room
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Rooms List -->
+    <div class="card shadow-sm" data-aos="fade-up">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Current Rooms ({{ rooms|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% if rooms %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Hotel</th>
+                                <th>Room #</th>
+                                <th>Type</th>
+                                <th>Capacity</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for room in rooms %}
+                            <tr>
+                                <td><strong>{{ room.hotel_name }}</strong></td>
+                                <td>{{ room.room_number }}</td>
+                                <td><span class="badge bg-light text-dark">{{ room.room_type }}</span></td>
+                                <td><i class="fas fa-users"></i> {{ room.capacity }}</td>
+                                <td><strong class="text-primary">${{ room.price_per_night }}</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if room.status == 'available' else 'warning' if room.status == 'booked' else 'danger' }}">
+                                        {{ room.status|capitalize }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted text-center py-4">No rooms added yet</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('addRoomForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const data = {
+        hotel_id: parseInt(document.getElementById('hotel_id').value),
+        room_number: document.getElementById('room_number').value,
+        room_type: document.getElementById('room_type').value,
+        capacity: parseInt(document.getElementById('capacity').value),
+        price_per_night: parseFloat(document.getElementById('price_per_night').value),
+        description: document.getElementById('description').value,
+        amenities: document.getElementById('amenities').value
+    };
+    
+    try {
+        const response = await fetch('/admin/rooms/add', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('✅ ' + result.message);
+            document.getElementById('addRoomForm').reset();
+            location.reload();
+        } else {
+            alert('❌ Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('❌ Error: ' + error.message);
+    }
+});
+</script>
+{% endblock %}

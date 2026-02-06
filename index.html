@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Home - SmartStay Hotels{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content" data-aos="fade-up">
+        <h1 class="display-4 fw-bold mb-3">Find Your Perfect Hotel</h1>
+        <p class="lead mb-4">Experience comfort and luxury at the best prices</p>
+        
+        <!-- Search Bar -->
+        <div class="search-container shadow-lg p-4 bg-white rounded-3">
+            <form id="searchForm" method="GET" action="/search" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">City</label>
+                    <input type="text" name="city" class="form-control form-control-lg" placeholder="Enter city">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Check-in</label>
+                    <input type="date" name="check_in" id="checkIn" class="form-control form-control-lg">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Check-out</label>
+                    <input type="date" name="check_out" id="checkOut" class="form-control form-control-lg">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Guests</label>
+                    <input type="number" name="guests" class="form-control form-control-lg" value="1" min="1">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-search"></i> Search Rooms
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Rooms -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold" data-aos="fade-up">Featured Rooms</h2>
+        <div class="row g-4">
+            {% for room in featured_rooms %}
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card h-100 shadow-sm border-0 room-card">
+                    <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop" class="card-img-top" alt="{{ room.room_type }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ room.hotel_name }} - {{ room.room_type }}</h5>
+                        <p class="text-muted mb-2"><i class="fas fa-map-marker-alt"></i> {{ room.city }}</p>
+                        <p class="mb-2">
+                            <i class="fas fa-star text-warning"></i>
+                            <span class="fw-bold">{{ room.rating }}</span>
+                        </p>
+                        <p class="card-text text-muted">{{ room.description[:60] if room.description else "Quality room" }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 text-primary fw-bold">${{ room.price_per_night }}/night</h6>
+                            <a href="/room/{{ room.id }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold" data-aos="fade-up">Why Choose SmartStay?</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3" data-aos="zoom-in">
+                <div class="feature-box text-center p-4">
+                    <i class="fas fa-tag fa-3x text-primary mb-3"></i>
+                    <h5>Best Prices</h5>
+                    <p class="text-muted">Competitive rates and exclusive deals</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3" data-aos="zoom-in" data-aos-delay="100">
+                <div class="feature-box text-center p-4">
+                    <i class="fas fa-lock fa-3x text-primary mb-3"></i>
+                    <h5>Secure Booking</h5>
+                    <p class="text-muted">Safe and encrypted transactions</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3" data-aos="zoom-in" data-aos-delay="200">
+                <div class="feature-box text-center p-4">
+                    <i class="fas fa-headset fa-3x text-primary mb-3"></i>
+                    <h5>24/7 Support</h5>
+                    <p class="text-muted">Round-the-clock customer assistance</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3" data-aos="zoom-in" data-aos-delay="300">
+                <div class="feature-box text-center p-4">
+                    <i class="fas fa-award fa-3x text-primary mb-3"></i>
+                    <h5>Quality Hotels</h5>
+                    <p class="text-muted">Verified and trusted properties</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3" data-aos="count-up">
+                <h3 class="display-5 fw-bold">10K+</h3>
+                <p>Happy Guests</p>
+            </div>
+            <div class="col-md-3" data-aos="count-up" data-aos-delay="100">
+                <h3 class="display-5 fw-bold">500+</h3>
+                <p>Hotels</p>
+            </div>
+            <div class="col-md-3" data-aos="count-up" data-aos-delay="200">
+                <h3 class="display-5 fw-bold">50K+</h3>
+                <p>Bookings</p>
+            </div>
+            <div class="col-md-3" data-aos="count-up" data-aos-delay="300">
+                <h3 class="display-5 fw-bold">4.8★</h3>
+                <p>Rating</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-light">
+    <div class="container text-center" data-aos="fade-up">
+        <h3 class="mb-4">Ready to book your stay?</h3>
+        <p class="lead mb-4">Discover thousands of hotels and experience unforgettable moments</p>
+        <a href="/search" class="btn btn-primary btn-lg px-5">
+            <i class="fas fa-search"></i> Start Exploring
+        </a>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('checkIn').setAttribute('min', today);
+    document.getElementById('checkIn').value = today;
+    
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+    document.getElementById('checkOut').setAttribute('min', today);
+    document.getElementById('checkOut').value = tomorrow;
+});
+</script>
+{% endblock %}

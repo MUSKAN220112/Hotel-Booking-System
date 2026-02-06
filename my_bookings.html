@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}My Bookings - SmartStay Hotels{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4" data-aos="fade-up"><i class="fas fa-calendar-check"></i> My Bookings</h2>
+    
+    {% if bookings %}
+        <div class="row g-4">
+            {% for booking in bookings %}
+            <div class="col-lg-6" data-aos="fade-up">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-primary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-ticket-alt"></i> {{ booking.booking_id }}</span>
+                            <span class="badge bg-{{ 'success' if booking.status == 'confirmed' else 'warning' if booking.status == 'pending' else 'danger' }}">
+                                {{ booking.status|upper }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">{{ booking.hotel_name }}</h5>
+                        
+                        <div class="row text-center mb-3">
+                            <div class="col-md-6 border-end">
+                                <small class="text-muted">Check-in</small>
+                                <p class="fw-bold">{{ booking.check_in_date }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">Check-out</small>
+                                <p class="fw-bold">{{ booking.check_out_date }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 p-3 bg-light rounded">
+                            <p class="mb-1"><small class="text-muted">Room</small></p>
+                            <p class="fw-bold">{{ booking.room_number }} - {{ booking.room_type }}</p>
+                            <p class="mb-0"><small class="text-muted">{{ booking.number_of_guests }} Guest(s)</small></p>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-primary">${{ "%.2f"|format(booking.total_price) }}</h5>
+                            <small class="text-muted">{{ booking.created_at[:10] }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-light border-0">
+                        <div class="d-grid gap-2">
+                            {% if booking.status != 'cancelled' %}
+                                <button class="btn btn-sm btn-outline-danger" onclick="cancelBooking('{{ booking.booking_id }}')">
+                                    <i class="fas fa-times"></i> Cancel Booking
+                                </button>
+                            {% else %}
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    <i class="fas fa-ban"></i> Cancelled
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center py-5" role="alert">
+            <i class="fas fa-inbox fa-3x mb-3"></i>
+            <h5>No bookings yet</h5>
+            <p>Start exploring and book your next stay</p>
+            <a href="/search" class="btn btn-primary mt-3">
+                <i class="fas fa-search"></i> Search Hotels
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+async function cancelBooking(bookingId) {
+    if (!confirm('Are you sure you want to cancel this booking?')) return;
+    
+    try {
+        const response = await fetch(`/booking/${bookingId}/cancel`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('✅ Booking cancelled successfully');
+            location.reload();
+        } else {
+            alert('❌ Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+</script>
+{% endblock %}
